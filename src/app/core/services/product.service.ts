@@ -17,11 +17,13 @@ export class ProductService {
   getProductList(p?: TGetProductList): Observable<any> {
 
     let url = 'https://xleftpcawg.execute-api.ap-southeast-1.amazonaws.com/beta/product/test/list?compId=po-1d1f72'
-
+    
     if (p && p.limit) {
+      console.log("limit => ",p.limit);
       url += `&limit=${p.limit}`
     }
-    if (p && p.nextPageKey) {
+    if (p && p.nextPageKey && !this.isEmpty(p.nextPageKey)) {
+      console.log("nextPageKey => ",p.nextPageKey);
       url += `&key_0=${encodeURIComponent(p.nextPageKey.PK)}&key_1=${encodeURIComponent(p.nextPageKey.SK)}&key_2=${encodeURIComponent(p.nextPageKey.GSI6PK)}&key_3=${encodeURIComponent(p.nextPageKey.GSI6SK)}`
     }
 
@@ -29,5 +31,13 @@ export class ProductService {
 
     return this.http.get(url)
   }
+
+  isEmpty(obj:any) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
 
 }
