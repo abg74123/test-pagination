@@ -1,0 +1,16 @@
+<ng-container *ngIf="products$ | async as products">
+  <p-table [value]="products" [first]="first" [rows]="rows" [paginator]="true" (onLazyLoad)="onPageChange($event)" [totalRecords]="21" [showFirstLastIcon]="false" [rowsPerPageOptions]="[2 ,5, 10, 25, 50]" [lazy]="true" [loading]="loading" [scrollable]="true" scrollHeight="600px"  [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>productId</th>
+        <th>productName</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td>{{ product.productId }}</td>
+        <td>{{ product.productName }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ng-container>
