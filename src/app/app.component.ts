@@ -18,10 +18,10 @@ export class AppComponent implements OnInit{
   destroy:any = new Subject()
   products:any = new BehaviorSubject([])
   products$:Observable<any> = this.products.asObservable()
-  loading: boolean = false;
+  loading: boolean = true;
   first: number = 0;
   rows: number = 10;
-  totalRecords: number = 0
+  totalRecords: number = 10
   // key next page
   nexPageKey = {}
   // store
@@ -49,24 +49,27 @@ export class AppComponent implements OnInit{
     const sliceProduct = this.productsArr.slice(startSlice, endSlice)
     console.log({sliceProduct})
 
-    if(!!sliceProduct.length){
-      console.log("!!!not get new product")
-      this.products.next(sliceProduct)
-    }else{
-    this.loading = true;
+    console.log("productsArr => ",this.productsArr.length)
+    console.log("rows => ",this.rows)
+
+    if(sliceProduct.length < this.rows && this.productsArr.length < this.totalRecords){
+      this.loading = true;
       console.log("get new product")
       this.productService.getProductList({compId:'po-1d1f72',nextPageKey:this.nexPageKey,limit:endSlice - this.productsArr.length}).pipe(
         tap(
-        (res:any) => {
-          this.productsArr.push(...res.data)
-          this.nexPageKey = res.pagination.nexPageKey
-          this.totalRecords = res.pagination.count
-          this.products.next(this.productsArr.slice(startSlice, endSlice))
-          this.loading = false;
-        }
-      ),
+          (res:any) => {
+            this.productsArr.push(...res.data)
+            this.nexPageKey = res.pagination.nexPageKey
+            this.totalRecords = res.pagination.count
+            this.products.next(this.productsArr.slice(startSlice, endSlice))
+            this.loading = false;
+          }
+        ),
         takeUntil(this.destroy),
       ).subscribe()
+    }else{
+      console.log("!!!not get new product")
+      this.products.next(sliceProduct)
     }
 
   }
