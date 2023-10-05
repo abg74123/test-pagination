@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 
 interface TGetProductList{
+  compId:string,
   limit?:number,
   nextPageKey?:any
 }
@@ -16,8 +17,8 @@ export class ProductService {
 
   getProductList(p?: TGetProductList): Observable<any> {
 
-    let url = 'https://xleftpcawg.execute-api.ap-southeast-1.amazonaws.com/beta/product/test/list?compId=po-1d1f72'
-    
+    let url = `https://xleftpcawg.execute-api.ap-southeast-1.amazonaws.com/beta/product/test/list?compId=${p?.compId}`
+
     if (p && p.limit) {
       console.log("limit => ",p.limit);
       url += `&limit=${p.limit}`

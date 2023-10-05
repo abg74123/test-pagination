@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductService} from "./core/services/product.service";
-import {BehaviorSubject, Observable, shareReplay, tap} from "rxjs";
+import {BehaviorSubject, Observable,Subject, shareReplay, takeUntil, tap} from "rxjs";
 
 interface PageEvent {
   first: number;
@@ -15,7 +15,7 @@ interface PageEvent {
 })
 
 export class AppComponent implements OnInit{
-
+  destroy:any = new Subject()
   products:any = new BehaviorSubject([])
   products$:Observable<any> = this.products.asObservable().pipe(shareReplay(1))
   loading: boolean = false;
@@ -48,23 +48,32 @@ export class AppComponent implements OnInit{
 
     const sliceProduct = this.productsArr.slice(startSlice, endSlice)
     console.log({sliceProduct})
-    
+
     if(!!sliceProduct.length){
       console.log("!!!not get new product")
       this.products.next(sliceProduct)
     }else{
     this.loading = true;
       console.log("get new product")
-      this.productService.getProductList({nextPageKey:this.nexPageKey,limit:endSlice - this.productsArr.length}).pipe(tap(
+      this.productService.getProductList({compId:'po-1d1f72',nextPageKey:this.nexPageKey,limit:endSlice - this.productsArr.length}).pipe(
+        tap(
         (res:any) => {
           this.productsArr.push(...res.data)
           this.nexPageKey = res.pagination.nexPageKey
           this.products.next(this.productsArr.slice(startSlice, endSlice))
           this.loading = false;
         }
-      )).subscribe()
+      ),
+        takeUntil(this.destroy),
+      ).subscribe()
     }
-   
+
+  }
+
+  ngOnDestroy(): void {
+    console.log("destroy component")
+    this.destroy.next()
+    this.destroy.complete()
   }
 
 }
