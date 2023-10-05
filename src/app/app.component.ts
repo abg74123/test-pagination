@@ -17,11 +17,11 @@ interface PageEvent {
 export class AppComponent implements OnInit{
   destroy:any = new Subject()
   products:any = new BehaviorSubject([])
-  products$:Observable<any> = this.products.asObservable().pipe(shareReplay(1))
+  products$:Observable<any> = this.products.asObservable()
   loading: boolean = false;
   first: number = 0;
   rows: number = 10;
-
+  totalRecords: number = 0
   // key next page
   nexPageKey = {}
   // store
@@ -60,6 +60,7 @@ export class AppComponent implements OnInit{
         (res:any) => {
           this.productsArr.push(...res.data)
           this.nexPageKey = res.pagination.nexPageKey
+          this.totalRecords = res.pagination.count
           this.products.next(this.productsArr.slice(startSlice, endSlice))
           this.loading = false;
         }
